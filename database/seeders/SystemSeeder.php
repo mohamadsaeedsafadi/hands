@@ -296,7 +296,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -332,7 +332,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -368,7 +368,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -396,7 +396,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -425,7 +425,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -453,7 +453,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -480,7 +480,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -508,7 +508,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -536,7 +536,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -564,7 +564,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -591,7 +591,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -618,7 +618,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -646,7 +646,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -671,7 +671,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -697,7 +697,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -723,7 +723,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -750,7 +750,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -777,7 +777,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -804,7 +804,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -830,7 +830,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -856,7 +856,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -883,7 +883,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
@@ -912,7 +912,7 @@ ServiceQuestion::create([
 'category_id'=>$id,
 'question'=>$q,
 'type'=>'text',
-'required'=>true
+'is_required'=>true
 ]);
 
 }
