@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Models\AuditLog;
 use App\Models\ServiceCategory;
 use App\Models\ServiceOffer;
 use App\Repositories\ServiceOfferRepository;
@@ -75,7 +76,7 @@ public function acceptOffer(ServiceOffer $offer)
     $offer->provider,
     $offer->serviceRequest
 );
-
+$this->logCustom('offer_accepted', $offer);
     return $offer;
 }
     public function completeService($provider, $offerId, $finalPrice)
@@ -89,13 +90,13 @@ if ($offer->status !== 'accepted' && $offer->status !== 'in_progress') {
         }
 
         if($finalPrice < $offer->min_price || $finalPrice > $offer->max_price) {
-            // السعر خارج الرينج → موافقة المستخدم مطلوبة
+          
             $this->repo->update($offer, [
                 'final_price' => $finalPrice,
                 'status' => 'awaiting_user_approval'
             ]);
         } else {
-            // السعر داخل الرينج → الدفع مباشرة
+           
             $this->repo->update($offer, [
                 'final_price' => $finalPrice,
                 'status' => 'awaiting_payment'
@@ -135,7 +136,9 @@ if ($offer->status !== 'accepted' && $offer->status !== 'in_progress') {
     $this->repo->update($offer, [
         'status' => 'price_rejected'
     ]);
-
+$this->logCustom('price_rejected', $offer, [
+    'price' => $offer->final_price
+]);
     return $offer;
 }
 public function updateFinalPrice($provider, $offerId, $newPrice)
@@ -150,12 +153,12 @@ public function updateFinalPrice($provider, $offerId, $newPrice)
         throw new \Exception("Cannot update price now");
     }
 
-    // ❗ الشرط المهم
-    if ($newPrice >= $offer->final_price) {
-        throw new \Exception("New price must be lower than previous price");
-    }
 
-    // تحقق من الرينج
+   if ($offer->final_price !== null && $newPrice >= $offer->final_price) {
+    throw new \Exception("New price must be lower than previous price");
+}
+
+   
     if ($newPrice < $offer->min_price || $newPrice > $offer->max_price) {
 
         $this->repo->update($offer, [
@@ -172,5 +175,35 @@ public function updateFinalPrice($provider, $offerId, $newPrice)
     }
 
     return $offer;
+}
+public function startService($provider, $offerId)
+{
+    $offer = ServiceOffer::findOrFail($offerId);
+
+    if ($offer->provider_id !== $provider->id) {
+        throw new \Exception("Unauthorized");
+    }
+
+    if ($offer->status !== 'accepted') {
+        throw new \Exception("Service cannot be started");
+    }
+
+    $this->repo->update($offer, [
+        'status' => 'in_progress'
+    ]);
+
+    return $offer;
+}
+private function logCustom($action, $offer, $data = [])
+{
+    AuditLog::create([
+        'user_id' => Auth::user()->id,
+        'action' => $action,
+        'model_type' => ServiceOffer::class,
+        'model_id' => $offer->id,
+        'new_values' => $data,
+        'ip' => request()->ip(),
+        'user_agent' => request()->userAgent()
+    ]);
 }
 }

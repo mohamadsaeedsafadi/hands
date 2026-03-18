@@ -41,7 +41,7 @@ class ChatService
 
         broadcast(new MessageSent($msg))->toOthers();
 
-        return $msg->load('sender'); // مهم جداً
+        return $msg->load('sender'); 
     }
 
     public function getMessages($conversationId)

@@ -13,7 +13,7 @@ class ProviderProfileController extends Controller {
         $this->service = $service;
     }
 
-    // تحديث بيانات البروفايل لمقدم الخدمة
+  
     public function update(Request $request) {
         $user = Auth::user();
         $profile = $this->service->setupProviderProfile($user->id, $request->all());
@@ -21,7 +21,7 @@ class ProviderProfileController extends Controller {
         return response()->json(['message' => 'Profile updated successfully', 'data' => $profile]);
     }
 
-    // إضافة عمل لمعرض الأعمال
+   
     public function storePortfolio(Request $request) {
         $request->validate([
             'title' => 'required|string',

@@ -25,7 +25,7 @@ class UserAuthService
         throw new \Exception('Invalid credentials');
     }
 
-    // حساب مقفل؟
+   
     if ($user->locked_until && now()->lessThan($user->locked_until)) {
         throw new \Exception('Account locked temporarily');
     }
@@ -52,7 +52,7 @@ class UserAuthService
         throw new \Exception('Email not verified');
     }
 
-    // reset attempts
+   
     $user->update([
         'failed_attempts' => 0,
         'locked_until' => null,

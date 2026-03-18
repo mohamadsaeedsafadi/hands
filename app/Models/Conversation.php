@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\AuditTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Conversation extends Model
@@ -11,7 +12,7 @@ class Conversation extends Model
         'user_id',
         'provider_id'
     ];
-
+ use AuditTrait;
     public function messages()
     {
         return $this->hasMany(Message::class);

@@ -9,14 +9,14 @@ class AuditLog extends Model
         'action',
         'model',
         'model_id',
-        'before',
-        'after',
+        'old_values',
+        'new_values',
         'ip_address',
         'user_agent'
     ];
 
     protected $casts = [
-        'before' => 'array',
-        'after' => 'array'
+        'old_values' => 'array',
+        'new_values' => 'array'
     ];
 }

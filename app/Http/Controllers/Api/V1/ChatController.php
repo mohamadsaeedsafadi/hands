@@ -20,7 +20,7 @@ class ChatController extends Controller
 
         $user = $request->user();
 
-        // تأكد أن المستخدم طرف في المحادثة
+       
         if (
             $conversation->user_id !== $user->id &&
             $conversation->provider_id !== $user->id

@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Traits\AuditTrait;
 use Illuminate\Database\Eloquent\Model;
 class ServiceRequest extends Model
 {
@@ -10,7 +11,7 @@ class ServiceRequest extends Model
         'answers',
         'status'
     ];
-
+ use AuditTrait;
     protected $casts = [
         'answers' => 'array'
     ];

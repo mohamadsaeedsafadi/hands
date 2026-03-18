@@ -13,7 +13,7 @@ class UserProfileController extends Controller {
         $this->userService = $userService;
     }
 
-    // تحديث الملف الشخصي (الهاتف، المدينة، الصورة)
+    
     public function update(Request $request) {
         $request->validate([
             'phone'  => 'nullable|string|max:20',

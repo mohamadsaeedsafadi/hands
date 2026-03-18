@@ -4,6 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\ServiceRequest;
+use App\Traits\AuditTrait;
 
 class ServiceOffer extends Model
 {
@@ -13,10 +14,10 @@ class ServiceOffer extends Model
         'min_price',
         'max_price',
         'final_price',
-        'status', // pending, accepted, completed, awaiting_payment, awaiting_user_approval, closed
+        'status', 
         'message'
     ];
-
+ use AuditTrait;
    public function serviceRequest()
 {
     return $this->belongsTo(ServiceRequest::class);

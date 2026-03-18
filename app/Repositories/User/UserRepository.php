@@ -27,7 +27,7 @@ class UserRepository implements UserRepositoryInterface
         );
     }
 
-    // جلب بيانات الملف الشخصي مع بيانات المستخدم الأساسية
+    
     public function getProfileByUserId($userId) {
         return UserProfile::where('user_id', $userId)->with('user')->first();
     }

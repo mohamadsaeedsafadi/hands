@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\AuditTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
@@ -16,4 +17,5 @@ class Payment extends Model
         'amount_usd',
         'status'
     ];
+     use AuditTrait;
 }

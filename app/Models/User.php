@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\AuditTrait;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -19,7 +20,7 @@ class User extends Authenticatable implements JWTSubject
         'failed_attempts',
         'locked_until',
     ];
-
+ use AuditTrait;
     protected $hidden = [
         'password',
         'email_verification_code',

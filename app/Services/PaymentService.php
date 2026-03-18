@@ -29,9 +29,9 @@ class PaymentService
             'status' => 'paid'
         ]);
 
-        // تحديث حالة العرض
+    
         $offer->update([
-            'status' => 'paid'
+            'status' => 'waiting_for_rating'
         ]);
 
         return $payment;

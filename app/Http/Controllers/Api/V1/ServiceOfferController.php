@@ -67,7 +67,7 @@ public function complete(Request $request, $id)
         return response()->json($offer);
     }
 
-    // موافقة المستخدم على السعر الجديد
+    
     public function approvePrice(Request $request, $id)
     {
         $offer = $this->service->userApprovePrice($request->user(), $id);

@@ -11,7 +11,7 @@ class ProviderService {
     }
 
     public function setupProviderProfile($userId, $details) {
-        // يمكن إضافة منطق هنا للتأكد من أن الـ role هو provider
+       
         return $this->repo->updateOrCreateProfile($userId, [
             'title' => $details['title'],
             'experience_years' => $details['experience_years'],
@@ -19,7 +19,7 @@ class ProviderService {
     }
 
     public function uploadWorkToPortfolio($userId, $file, $info) {
-        // منطق رفع الصورة وتخزين المسار
+        
         $path = $file->store('portfolios', 'public');
         
         return $this->repo->addPortfolioItem($userId, [
