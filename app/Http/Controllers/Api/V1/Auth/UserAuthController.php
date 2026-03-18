@@ -41,7 +41,7 @@ class UserAuthController extends Controller
 {
     $request->validate([
         'email' => 'required|email',
-        'code'  => 'required'
+         'code'  => 'required|digits:6',
     ]);
 
     $user = User::where('email', $request->email)

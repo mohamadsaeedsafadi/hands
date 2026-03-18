@@ -76,12 +76,17 @@ public function complete(Request $request, $id)
 
 
 
-   public function pay($offer)
+   public function pay($offer,Request $request)
 {
-    
+$request->validate([
+    'amount' => 'required|numeric|min:1,max:9000000',
+    'cvc'=>'required|numeric|digits:3',
+    'account_number'=>'required|numeric|digits:16'
+]);
+    $price = $request->amount;
     $offer2 = ServiceOffer::findOrFail($offer);
     $payment = app(\App\Services\PaymentService::class)
-        ->pay($offer2);
+        ->pay($offer2,$price);
 
     return response()->json([
         'message' => 'Payment successful',

@@ -9,13 +9,15 @@ use Exception;
 
 class PaymentService
 {
-    public function pay(ServiceOffer $offer)
+    public function pay(ServiceOffer $offer ,$price)
     {
        if ($offer->status !== 'awaiting_payment') {
             throw new Exception("Offer not ready for payment");
        }
-
       
+      if($price !=$offer->final_price){
+        throw new Exception("ادخل المبلغ المطلوب للدفع");
+      }
         $payment = Payment::create([
             'service_offer_id' => $offer->id,
             'service_request_id' => $offer->service_request_id,

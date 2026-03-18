@@ -13,7 +13,7 @@ class ChatController extends Controller
     public function send(Request $request, $conversationId)
     {
         $request->validate([
-            'message' => 'required|string'
+            'message' => 'required|string|max:250'
         ]);
 
         $conversation = Conversation::findOrFail($conversationId);
