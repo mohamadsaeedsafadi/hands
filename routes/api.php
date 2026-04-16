@@ -209,7 +209,7 @@ Route::prefix('reports')->group(function () {
 Route::prefix('bans')->group(function () {
    Route::post('/{id}', [BanController::class, 'ban']);
       Route::post('/unban/{id}', [BanController::class, 'unban']);
-
+Route::get('banned-users', [BanController::class, 'bannedUsers']);
 
 });
 
