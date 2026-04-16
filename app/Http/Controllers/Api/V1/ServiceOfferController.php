@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ServiceOffer;
 use App\Services\chat\ChatService;
 use App\Services\ServiceOfferService;
@@ -42,12 +43,18 @@ class ServiceOfferController extends Controller
             $request->all()
         );
 
-        return response()->json($offer);
+       
+        return ApiResponse::success(
+    $offer
+);
     }
     public function accept(ServiceOffer $offer)
     {
         $offer2 = $this->service->acceptOffer($offer);
-        return response()->json($offer2);
+        
+        return ApiResponse::success(
+    $offer2
+);
     }
 public function updateCategories(Request $request)
 {
@@ -61,20 +68,20 @@ public function updateCategories(Request $request)
         $request->categories
     );
 
-    return response()->json(['message' => 'تم تحديث المجالات']);
+   return ApiResponse::success(null, 'تم تحديث المجالات');
 }
 public function complete(Request $request, $id)
     {
         $request->validate(['final_price' => 'required|numeric']);
         $offer = $this->service->completeService($request->user(), $id, $request->final_price);
-        return response()->json($offer);
+        return ApiResponse::success($offer, 'Service completed');
     }
 
     
     public function approvePrice(Request $request, $id)
     {
         $offer = $this->service->userApprovePrice($request->user(), $id);
-        return response()->json($offer);
+        return ApiResponse::success($offer);
     }
 
 
@@ -91,15 +98,15 @@ $request->validate([
     $payment = app(\App\Services\PaymentService::class)
         ->pay($offer2,$price);
 
-    return response()->json([
-        'message' => 'Payment successful',
-        'payment' => $payment
-    ]);
+    
+
+    return ApiResponse::success($payment);
 }
    public function rejectPrice(Request $request, $id)
 {
     $offer = $this->service->userRejectPrice($request->user(), $id);
-    return response()->json($offer);
+    
+    return ApiResponse::success($offer);
 }
 public function updatePrice(Request $request, $id)
 {
@@ -112,8 +119,7 @@ public function updatePrice(Request $request, $id)
         $id,
         $request->price
     );
-
-    return response()->json($offer);
+return ApiResponse::success($offer);
 }
 public function myoffer(Request $request)
 {
@@ -128,18 +134,19 @@ public function myoffer(Request $request)
 ]);
     $offers = $this->service->myoffer($request);
 
-    return response()->json([
-        'success' => true,
-        'data' => $offers
-    ]);
+    
+    return ApiResponse::success(
+    $offers
+);
 }
 public function nearby(Request $request)
 {
     $radius = $request->radius ?? 10;
 
-    return response()->json(
-        $this->userser->nearbyProviders($request->user(), $radius)
-    );
+  
+    return ApiResponse::success(
+    $this->userser->nearbyProviders($request->user(), $radius)
+);
 }
 public function nearbyOffers(Request $request)
 {
@@ -156,12 +163,13 @@ public function recommend(Request $request)
         'category_id' => 'required|exists:service_categories,id'
     ]);
 
-    return response()->json(
-        $this->service->recommendProviders(
+    
+     return ApiResponse::success(
+     $this->service->recommendProviders(
             $request->user(),
             $request->category_id
         )
-    );
+);
 }
 }
 

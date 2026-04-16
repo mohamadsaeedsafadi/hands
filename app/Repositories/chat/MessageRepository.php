@@ -14,6 +14,6 @@ class MessageRepository
     {
         return Message::where('conversation_id', $conversationId)
             ->orderBy('id')
-            ->get();
+            ->paginate(10);
     }
 }

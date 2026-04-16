@@ -101,7 +101,7 @@ public function getUserOffers($userId, $filters)
     }
 
 
-    $results = $query->get();
+    $results = $query->paginate(10);
 
     $offers = ServiceOffer::with([
         'provider.profile',
@@ -175,6 +175,7 @@ $offer->eta_minutes = isset($item->eta_minutes)
         ->whereNotNull('users.lat')
         ->whereNotNull('users.lng')
         ->where('service_offers.status', 'pending'); 
+        return $query->paginate(10);
 }
 public function smartProviders($lat, $lng, $categoryId)
 {
@@ -240,6 +241,6 @@ public function smartProviders($lat, $lng, $categoryId)
 
         ->orderByDesc('score')
         ->limit(10)
-        ->get();
+        ->paginate(10);
 }
 }

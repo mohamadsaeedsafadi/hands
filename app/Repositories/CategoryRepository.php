@@ -14,7 +14,7 @@ class CategoryRepository
     {
         return ServiceCategory::with('children')
             ->whereNull('parent_id')
-            ->get();
+            ->paginate(10);
     }
 
     public function findWithQuestions($id)
@@ -26,7 +26,7 @@ class CategoryRepository
 {
     return ServiceCategory::whereNull('parent_id')
         ->select('id','name')
-        ->get();
+        ->paginate(10);
 }
    public function getMainCategoriesbyid($id)
 {
@@ -38,14 +38,14 @@ public function getSubCategories($parentId)
 {
     return ServiceCategory::where('parent_id',$parentId)
         ->select('id','name','parent_id')
-        ->get();
+        ->paginate(10);
 }
  public function all()
     {
         return ServiceCategory::with('children')
             ->whereNull('parent_id')
             ->latest()
-            ->get();
+            ->paginate(10);
     }
 
    

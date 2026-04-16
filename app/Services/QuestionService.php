@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Http\Responses\ApiResponse;
 use App\Repositories\CategoryRepository;
 use App\Repositories\QuestionRepository;
 
@@ -25,7 +26,7 @@ class QuestionService
     
     $check= $this->rebo->getMainCategoriesbyid($categoryId);
     if($check == $categoryId){
-return 'must be subcat';
+return ApiResponse::error('Category must be a subcategory', 422);
     }
     return $this->rebo->findWithQuestions($categoryId);
 }

@@ -7,7 +7,7 @@ class QuestionRepository
 {
     public function all()
 {
-    return ServiceQuestion::with('category')->latest()->get();
+    return ServiceQuestion::with('category')->latest()->paginate(10);
 }
 
     public function create($data)

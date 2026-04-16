@@ -37,5 +37,10 @@ class BanController extends Controller
         $this->service->unbanUser($userId);
         return response()->json(['message' => 'User unbanned']);
     }
- 
+ public function bannedUsers()
+{
+    return response()->json(
+        $this->service->getBannedUsers()
+    );
+}
 }

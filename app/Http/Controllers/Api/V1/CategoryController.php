@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Services\CategoryService;
 use App\Services\QuestionService;
-
+use App\Http\Responses\ApiResponse;
 class CategoryController extends Controller
 {
     protected $categoryService;
@@ -18,43 +18,40 @@ protected $questionService;
 
     public function index()
     {
-        return response()->json(
-            $this->categoryService->listCategories()
-        );
+        return ApiResponse::success(
+    $this->categoryService->listCategories()
+);
     }
 
     public function show($id)
     {
-        return response()->json(
-            $this->categoryService->getCategoryWithQuestions($id)
-        );
+        return ApiResponse::success(
+    $this->categoryService->getCategoryWithQuestions($id)
+);
+        
     }
     public function mainCategories()
 {
-    $categories = $this->categoryService->getMainCategories();
+   
 
-    return response()->json([
-        'success' => true,
-        'data' => $categories
-    ]);
+    return ApiResponse::success(
+    $this->categoryService->getMainCategories()
+);
 }
 public function subCategories($id)
 {
-    $categories = $this->categoryService->getSubCategories($id);
 
-    return response()->json([
-        'success'=>true,
-        'data'=>$categories
-    ]);
+    return ApiResponse::success(
+    $this->categoryService->getSubCategories($id)
+);
 }
 public function categoryQuestions($id)
 {
     $questions = $this->questionService->getCategoryQuestions($id);
 
-    return response()->json([
-        'success'=>true,
-        'data'=>$questions
-    ]);
+    return ApiResponse::success(
+    $questions
+);
 }
     
 }

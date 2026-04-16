@@ -46,7 +46,7 @@ app(\App\Services\BanService::class)
             $query->where('type', $filters['type']);
         }
 
-        return $query->latest()->get();
+        return $query->latest()->paginate(10);
     }
 
     public function updateStatus($id, $status)

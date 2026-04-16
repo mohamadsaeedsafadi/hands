@@ -15,6 +15,6 @@ class ServiceRequestRepository
 
     return (ServiceRequest::whereIn('category_id', $categoryIds)
         ->where('status', 'pending')
-        ->get());
+        ->paginate(10));
 }
 }

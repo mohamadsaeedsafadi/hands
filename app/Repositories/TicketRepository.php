@@ -12,7 +12,7 @@ class TicketRepository
 
     public function getUserTickets($userId)
     {
-        return Ticket::where('user_id', $userId)->latest()->get();
+        return Ticket::where('user_id', $userId)->latest()->paginate(10);
     }
 
     public function getAll($filters)
@@ -31,7 +31,7 @@ class TicketRepository
             $query->where('type', $filters['type']);
         }
 
-        return $query->latest()->get();
+        return $query->latest()->paginate(10);
     }
 
     public function find($id)

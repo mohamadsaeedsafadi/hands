@@ -112,6 +112,14 @@ public function bans()
 
 public function isBanned()
 {
+    // فك الحظر المنتهي تلقائياً
+    $this->bans()
+        ->where('is_active', true)
+        ->whereNotNull('banned_until')
+        ->where('banned_until', '<=', now())
+        ->update(['is_active' => false]);
+
+    // تحقق من وجود حظر فعال
     return $this->bans()
         ->where('is_active', true)
         ->where(function ($q) {

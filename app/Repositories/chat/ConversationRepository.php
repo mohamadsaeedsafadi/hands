@@ -33,6 +33,6 @@ class ConversationRepository
           ->orWhere('provider_id', $userId);
     })
     ->latest()
-    ->get();
+    ->paginate(10);
     }
 }

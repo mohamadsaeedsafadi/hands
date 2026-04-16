@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Services\ServiceRequestService;
 use Illuminate\Http\Request;
 class ServiceRequestController extends Controller
@@ -28,15 +29,17 @@ class ServiceRequestController extends Controller
             $request->all()
         );
 
-        return response()->json($serviceRequest);
+       
+        return ApiResponse::success($serviceRequest);
     }
     public function availableRequests(Request $request)
 {
-    return response()->json(
-        $this->service->getAvailableRequestsForProvider(
+    
+       return ApiResponse::success(
+     $this->service->getAvailableRequestsForProvider(
             $request->user()
         )
-    );
+);
 }
 
 }

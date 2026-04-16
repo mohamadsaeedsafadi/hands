@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Conversation;
 use App\Services\chat\ChatService;
 use Illuminate\Http\Request;
@@ -25,7 +26,9 @@ class ChatController extends Controller
             $conversation->user_id !== $user->id &&
             $conversation->provider_id !== $user->id
         ) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            
+            
+            return ApiResponse::error('Unauthorized', 403);
         }
 
         $msg = $this->chatService->sendMessage(
@@ -34,7 +37,8 @@ class ChatController extends Controller
             $request->message
         );
 
-        return response()->json($msg);
+      
+        return ApiResponse::success($msg);
     }
 
     public function messages(Request $request, $conversationId)
@@ -45,17 +49,21 @@ class ChatController extends Controller
         $conversation->user_id !== $request->user()->id &&
         $conversation->provider_id !== $request->user()->id
     ) {
-        return response()->json(['message' => 'Unauthorized'], 403);
+          return ApiResponse::error('Unauthorized', 403);
+
     }
 
-    return response()->json(
-        $this->chatService->getMessages($conversationId)
-    );
+   
+    return ApiResponse::success(
+    $this->chatService->getMessages($conversationId)
+);
 }
 public function myChats(Request $request)
 {
     $chats = $this->chatService->myConversations($request->user());
 
-    return response()->json($chats);
+  return ApiResponse::success(
+    $chats
+);
 }
 }

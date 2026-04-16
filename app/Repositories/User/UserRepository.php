@@ -37,7 +37,7 @@ class UserRepository implements UserRepositoryInterface
         ->whereNotNull('lng')
         ->having('distance', '<=', $radius)
         ->orderBy('distance')
-        ->get();
+        ->paginate(10);
 }
   
 }
