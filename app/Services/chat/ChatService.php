@@ -51,7 +51,7 @@ class ChatService
     {
         return $this->messageRepo
             ->getByConversation($conversationId)
-            ->load('sender');
+            ;
     }
     public function closeConversation($serviceRequestId)
 {

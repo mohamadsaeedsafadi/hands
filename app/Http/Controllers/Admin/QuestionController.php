@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\ServiceQuestion;
 use App\Services\Admin\AdminQuestionService;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class QuestionController extends Controller
 
     public function index()
     {
-        return $this->service->getAll();
+         return ApiResponse::success($this->service->getAll() );
     }
 
    public function store(Request $request)
@@ -38,7 +39,8 @@ class QuestionController extends Controller
         'is_required' => 'boolean'
     ]);
 
-    return $this->service->create($data);
+    
+     return ApiResponse::success( $this->service->create($data));
 }
 
     public function update($id, Request $request)
@@ -51,7 +53,8 @@ class QuestionController extends Controller
         'is_required' => 'boolean'
     ]);
 
-    return $this->service->update($id, $data);
+   
+     return ApiResponse::success( $this->service->update($id,$data));
 }
 
     public function delete($id)
@@ -59,6 +62,6 @@ class QuestionController extends Controller
     $q = ServiceQuestion::findOrFail($id);
     $q->delete();
 
-    return $q;
+     return ApiResponse::success( $q);;
 }
 }

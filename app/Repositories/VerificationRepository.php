@@ -24,7 +24,7 @@ class VerificationRepository
 
     public function getAllPending()
     {
-        return VerificationRequest::where('status', 'pending')->get();
+        return VerificationRequest::where('status', 'pending')->paginate(10);
     }
 
     public function update($request, $data)

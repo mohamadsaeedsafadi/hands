@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\AuditLog;
 use App\Services\AnalyticsService;
 use Illuminate\Http\Request;
@@ -13,13 +14,14 @@ class AnalyticsController extends Controller
 
     public function dashboard(Request $request)
     {
-        return response()->json([
-            'users' => $this->service->usersCount($request->from, $request->to),
+       
+                return ApiResponse::success([  'users' => $this->service->usersCount($request->from, $request->to),
             'requests' => $this->service->requestsCount($request->from, $request->to),
             'completed' => $this->service->completedRequests($request->from, $request->to),
             'top_providers' => $this->service->topProviders(),
-            'requests_per_category' => $this->service->requestsPerCategory()
-        ]);
+            'requests_per_category' => $this->service->requestsPerCategory()]
+ 
+);
     }
     public function export()
 {

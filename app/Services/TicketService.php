@@ -1,22 +1,39 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Ticket;
 use App\Models\TicketMessage;
 use App\Models\TicketAttachment;
-use App\Models\User;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class TicketService
 {
+    private function ticketReferenceKey($reference)
+    {
+        return "ticket:reference:{$reference}";
+    }
+
+    private function ticketMessagesKey($ticketId)
+    {
+        return "ticket:messages:{$ticketId}";
+    }
+
+    private function ticketsFilterKey($filters)
+    {
+        return "tickets:filter:" . md5(json_encode($filters));
+    }
+
+    /* =========================
+       CREATE TICKET
+    ========================= */
     public function createTicket($userId, array $data)
     {
-        
         $reference = 'TCK-' . strtoupper(Str::random(8));
 
-       
         $ticket = Ticket::create([
             'reference' => $reference,
             'user_id' => $userId,
@@ -26,113 +43,153 @@ class TicketService
             'priority' => $data['priority'],
         ]);
 
-        
-        if (isset($data['attachments'])) {
+        // Invalidate related caches (important)
+        Cache::forget($this->ticketsFilterKey([]));
+
+        if (!empty($data['attachments'])) {
             foreach ($data['attachments'] as $file) {
-              $at=  TicketAttachment::create([
+                TicketAttachment::create([
                     'attachable_id' => $ticket->id,
                     'attachable_type' => Ticket::class,
                     'file_path' => $file->store('tickets', 'public')
                 ]);
             }
-            return [$ticket , $at ];
         }
 
         return $ticket;
     }
 
-   public function replyToTicket($ticketId, $sender, $data)
-{
-    $ticket = Ticket::findOrFail($ticketId);
+    /* =========================
+       REPLY
+    ========================= */
+    public function replyToTicket($ticketId, $sender, $data)
+    {
+        $ticket = Ticket::findOrFail($ticketId);
 
-    
-    if (empty($data['message']) && empty($data['attachments'])) {
-        throw new Exception("يجب إرسال رسالة أو ملف على الأقل");
-    }
-
-    DB::beginTransaction();
-
-    $message = TicketMessage::create([
-        'ticket_id' => $ticket->id,
-        'sender_id' => $sender->id,
-        'sender_type' => get_class($sender),
-        'message' => $data['message'] ?? null
-    ]);
-
-    
-    if (!empty($data['attachments'])) {
-        foreach ($data['attachments'] as $file) {
-            TicketAttachment::create([
-                'attachable_id' => $message->id,
-                'attachable_type' => TicketMessage::class,
-                'file_path' => $file->store('tickets/messages', 'public')
-            ]);
+        if (empty($data['message']) && empty($data['attachments'])) {
+            throw new Exception("يجب إرسال رسالة أو ملف على الأقل");
         }
-    }
 
-   
-    if ($ticket->status !== 'resolved') {
-        $ticket->update(['status' => 'waiting_user']);
-    }
+        DB::beginTransaction();
 
-    DB::commit();
-
-    return $message->load('attachments', 'sender');
-}
-
-    public function updateTicketStatus($ticketId, $status, $version)
-{
-    $updated = Ticket::where('id', $ticketId)
-        ->where('version', $version)
-        ->update([
-            'status' => $status,
-            'version' => DB::raw('version + 1')
+        $message = TicketMessage::create([
+            'ticket_id' => $ticket->id,
+            'sender_id' => $sender->id,
+            'sender_type' => get_class($sender),
+            'message' => $data['message'] ?? null
         ]);
 
-    if (!$updated) {
-        throw new \Exception("تم تعديل الشكوى من قبل شخص آخر");
+        if (!empty($data['attachments'])) {
+            foreach ($data['attachments'] as $file) {
+                TicketAttachment::create([
+                    'attachable_id' => $message->id,
+                    'attachable_type' => TicketMessage::class,
+                    'file_path' => $file->store('tickets/messages', 'public')
+                ]);
+            }
+        }
+
+        if ($ticket->status !== 'resolved') {
+            $ticket->update(['status' => 'waiting_user']);
+        }
+
+        DB::commit();
+
+        // Invalidate cache properly
+        Cache::forget($this->ticketMessagesKey($ticketId));
+
+        return $message->load('attachments', 'sender');
     }
 
-    return Ticket::find($ticketId);
-}
+    /* =========================
+       UPDATE STATUS
+    ========================= */
+    public function updateTicketStatus($ticketId, $status, $version)
+    {
+        $updated = Ticket::where('id', $ticketId)
+            ->where('version', $version)
+            ->update([
+                'status' => $status,
+                'version' => DB::raw('version + 1')
+            ]);
 
+        if (!$updated) {
+            throw new Exception("تم تعديل الشكوى من قبل شخص آخر");
+        }
+
+        Cache::forget($this->ticketMessagesKey($ticketId));
+
+        return Ticket::find($ticketId);
+    }
+
+    /* =========================
+       GET BY REFERENCE
+    ========================= */
     public function getTicketByReference($reference)
     {
-       
-        $ticket = Ticket::where('reference', $reference)->firstOrFail();
-        return $ticket;
+        return Cache::remember(
+            $this->ticketReferenceKey($reference),
+            300,
+            function () use ($reference) {
+                return Ticket::where('reference', $reference)
+                    ->firstOrFail();
+            }
+        );
     }
 
+    /* =========================
+       FILTER TICKETS
+    ========================= */
     public function filterTickets(array $filters)
     {
-        $query = Ticket::query();
+        $page = request('page', 1);
 
-       
-        if (isset($filters['priority'])) {
-            $query->where('priority', $filters['priority']);
-        }
+        $key = $this->ticketsFilterKey([
+            ...$filters,
+            'page' => $page
+        ]);
 
-      
-        if (isset($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-         if (isset($filters['type'])) {
-            $query->where('type', $filters['type']);
-        }
+        return Cache::remember($key, 300, function () use ($filters) {
 
-      
-        if (isset($filters['from']) && isset($filters['to'])) {
-            $query->whereBetween('created_at', [$filters['from'], $filters['to']]);
-        }
+            $query = Ticket::query();
 
-       
-        return $query->get();
+            if (!empty($filters['priority'])) {
+                $query->where('priority', $filters['priority']);
+            }
+
+            if (!empty($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            if (!empty($filters['type'])) {
+                $query->where('type', $filters['type']);
+            }
+
+            if (!empty($filters['from']) && !empty($filters['to'])) {
+                $query->whereBetween('created_at', [
+                    $filters['from'],
+                    $filters['to']
+                ]);
+            }
+
+            return $query->paginate(10);
+        });
     }
+
+    /* =========================
+       MESSAGES
+    ========================= */
     public function getTicketMessages($ticketId)
-{
-    return TicketMessage::with(['sender', 'attachments'])
-        ->where('ticket_id', $ticketId)
-        ->orderBy('created_at')
-        ->get();
-}
+    {
+        return Cache::remember(
+            $this->ticketMessagesKey($ticketId),
+            300,
+            function () use ($ticketId) {
+                return TicketMessage::with(['sender', 'attachments'])
+                    ->where('ticket_id', $ticketId)
+                    ->orderBy('created_at')
+                    ->paginate(20);
+            }
+        );
+    }
 }

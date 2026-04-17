@@ -8,6 +8,7 @@ use App\Repositories\ServiceOfferRepository;
 use App\Services\chat\ChatService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class ServiceOfferService
 {
@@ -30,7 +31,7 @@ class ServiceOfferService
 if ($exists) {
     throw new Exception('لقد قمت بإرسال عرض مسبقاً لهذا الطلب.');
 }
-
+$this->clearOfferCache($provider->id);
         return $this->repo->create([
             'service_request_id' => $data['service_request_id'],
             'provider_id' => $provider->id,
@@ -69,7 +70,8 @@ public function acceptOffer(ServiceOffer $offer)
     if ($offer->serviceRequest->status !== 'pending') {
         throw new \Exception("Request already accepted");
     }
-
+$this->clearOfferCache($offer->provider_id);
+$this->clearOfferCache($offer->serviceRequest->user_id);
     $offer->update(['status' => 'accepted']);
     $offer->serviceRequest->update(['status' => 'accepted']);
  ServiceOffer::where('service_request_id', $offer->service_request_id)
@@ -196,9 +198,14 @@ public function startService($provider, $offerId)
 
     return $offer;
 }
-public function myoffer($request){
-    $userid = Auth::user()->id;
- return $this->repo->getUserOffers($userid, $request->all());
+public function myoffer($request)
+{
+    $userId = Auth::user()->id;
+    $page = $request->get('page', 1);
+
+    return Cache::remember("offers.my.$userId.page.$page", 60, function () use ($request, $userId) {
+        return $this->repo->getUserOffers($userId, $request->all());
+    });
 }
 public function nearbyOffers($user, $filters)
 {
@@ -206,11 +213,18 @@ public function nearbyOffers($user, $filters)
         throw new \Exception("User location not set");
     }
 
-    return $this->repo->getNearbyOffers(
-        $user->lat,
-        $user->lng,
-        $filters
-    );
+    $page = request()->get('page', 1);
+    $radius = $filters['radius'] ?? 10;
+
+    $key = "offers.nearby.$user->id.$user->lat.$user->lng.$radius.page.$page";
+
+    return Cache::remember($key, 300, function () use ($user, $filters) {
+        return $this->repo->getNearbyOffers(
+            $user->lat,
+            $user->lng,
+            $filters
+        );
+    });
 }
 public function recommendProviders($user, $categoryId)
 {
@@ -218,10 +232,20 @@ public function recommendProviders($user, $categoryId)
         throw new \Exception("Location required");
     }
 
-    return $this->repo->smartProviders(
-        $user->lat,
-        $user->lng,
-        $categoryId
-    );
+    $page = request()->get('page', 1);
+
+    $key = "providers.recommend.$user->id.$categoryId.page.$page";
+
+    return Cache::remember($key, 600, function () use ($user, $categoryId) {
+        return $this->repo->smartProviders(
+            $user->lat,
+            $user->lng,
+            $categoryId
+        );
+    });
+}
+private function clearOfferCache($userId)
+{
+    Cache::flush(); 
 }
 }

@@ -7,6 +7,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\ProviderRepository;
 use App\Repositories\ServiceRequestRepository;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 
 class ServiceRequestService
@@ -80,6 +81,7 @@ $images = request()->file('answers');
         }
     }
 }
+Cache::forget("available_requests");
 
         return $this->requestRepo->create([
             'user_id' => $user->id,
@@ -117,17 +119,21 @@ $images = request()->file('answers');
     break;
         }
     }
-    public function getAvailableRequestsForProvider($provider)
+ public function getAvailableRequestsForProvider($provider)
 {
     if ($provider->role !== 'provider') {
-      return response()->json('غير مصرح');
+        return response()->json('غير مصرح');
     }
 
-$x=$this->provider->findifhavecat();
-if($x==null){
-    return response()->json('select cat first');
-}
-   return response()->json( $this->requestRepo
-        ->getRequestsForProvider($provider));
+    $x = $this->provider->findifhavecat();
+    if ($x == null) {
+        return response()->json('select cat first');
+    }
+
+    $key = "provider:{$provider->id}:available_requests:v1";
+
+    return Cache::remember($key, 300, function () use ($provider) {
+    return $this->requestRepo->getRequestsForProvider($provider);
+});
 }
 }

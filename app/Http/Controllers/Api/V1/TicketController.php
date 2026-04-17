@@ -11,6 +11,7 @@ use App\Services\TicketService;
 use App\Http\Requests\TicketRequest;
 use App\Http\Requests\TicketReplyRequest;
 use App\Http\Requests\UpdateTicketStatusRequest;
+use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
@@ -55,18 +56,18 @@ class TicketController extends Controller
     {
   
         $ticket = $this->ticketService->getTicketByReference($reference);
-        return response()->json($ticket);
+        return ApiResponse::success($ticket);
     }
 
     public function list(Request $request)
     {
         
         $tickets = $this->ticketService->filterTickets($request->all());
-        return response()->json($tickets);
+        return ApiResponse::success($tickets);
     }
     public function messages($ticketId)
 {
     $messages = $this->ticketService->getTicketMessages($ticketId);
-    return response()->json($messages);
+    return ApiResponse::success($messages);
 }
 }

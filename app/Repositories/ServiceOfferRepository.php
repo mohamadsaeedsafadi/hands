@@ -13,7 +13,11 @@ public function getUserOffers($userId, $filters)
 
     $lat = $user->lat;
     $lng = $user->lng;
+ $wantsDistance = !empty($filters['sort_by']) && in_array('distance', $filters['sort_by']);
 
+    if ($wantsDistance && (!$lat || !$lng)) {
+        throw new \Exception('يجب تحديد موقعك لاستخدام الترتيب حسب المسافة');
+    }
     $query = DB::table('service_offers')
         ->join('users', 'service_offers.provider_id', '=', 'users.id')
         ->join('service_requests', 'service_offers.service_request_id', '=', 'service_requests.id')
@@ -129,7 +133,7 @@ $offer->eta_minutes = isset($item->eta_minutes)
         return $offer;
     })->filter()->values();
 
-    return $final;
+    return $final ;
 }
     public function create($data)
     {   

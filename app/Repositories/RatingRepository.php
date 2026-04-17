@@ -18,6 +18,6 @@ class RatingRepository
 
     public function getProviderRatings($providerId)
     {
-        return Rating::where('provider_id',$providerId)->get();
+        return Rating::where('provider_id',$providerId)->paginate(10);
     }
 }

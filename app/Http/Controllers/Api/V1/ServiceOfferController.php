@@ -150,7 +150,7 @@ public function nearby(Request $request)
 }
 public function nearbyOffers(Request $request)
 {
-    return response()->json(
+    return ApiResponse::success(
         $this->service->nearbyOffers(
             $request->user(),
             $request->all()

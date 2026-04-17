@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Responses\ApiResponse;
 use App\Models\Report;
 use App\Models\UserBan;
 use App\Services\BanService;
@@ -29,7 +30,8 @@ class BanController extends Controller
             $request->all()
         );
 
-        return response()->json($ban);
+                return ApiResponse::success($ban
+);
     }
 
     public function unban($userId)
@@ -39,8 +41,7 @@ class BanController extends Controller
     }
  public function bannedUsers()
 {
-    return response()->json(
-        $this->service->getBannedUsers()
-    );
+   
+          return ApiResponse::success( $this->service->getBannedUsers());
 }
 }
