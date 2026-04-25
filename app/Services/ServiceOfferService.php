@@ -77,13 +77,16 @@ $this->clearOfferCache($offer->serviceRequest->user_id);
  ServiceOffer::where('service_request_id', $offer->service_request_id)
         ->where('id', '!=', $offer->id)
         ->update(['status' => 'rejected']);
-  $this->chatService->createConversation(
+ $conversation = $this->chatService->createConversation(
     $user,
     $offer->provider,
     $offer->serviceRequest
 );
 
-    return $offer;
+   return [
+    'offer' => $offer,
+    'conversation_id' => $conversation->id
+];
 }
     public function completeService($provider, $offerId, $finalPrice)
     {
