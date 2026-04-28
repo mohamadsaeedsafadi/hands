@@ -9,11 +9,10 @@ class Profile extends Model
     protected $fillable = [
         'user_id',
         'image',
-        'phone',
         'city',
-        'address',
+        'location',
         'bio',
-        'skills'
+        'extra'
     ];
 
     protected $casts = [

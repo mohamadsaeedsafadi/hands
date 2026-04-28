@@ -89,18 +89,12 @@ public function averageRating()
 {
     return $this->ratings()->avg('rating');
 }
-public function portfolios()
-{
-    return $this->hasMany(Portfolio::class);
-}
+
 public function verificationRequests()
 {
     return $this->hasMany(VerificationRequest::class);
 }
-public function profile()
-{
-    return $this->hasOne(Profile::class);
-}
+
 public function tickets()
 {
     return $this->hasMany(Ticket::class);
@@ -127,5 +121,14 @@ public function isBanned()
               ->orWhere('banned_until', '>', now());
         })
         ->exists();
+}
+public function profile()
+{
+    return $this->hasOne(Profile::class);
+}
+
+public function portfolios()
+{
+    return $this->hasMany(Portfolio::class);
 }
 }

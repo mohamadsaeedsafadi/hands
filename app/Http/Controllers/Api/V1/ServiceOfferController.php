@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
+use App\Models\Payment;
 use App\Models\ServiceOffer;
 use App\Services\chat\ChatService;
 use App\Services\ServiceOfferService;
 use Illuminate\Http\Request;
 use App\Services\PaymentService;
+use App\Services\ShamCashService;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use Stripe\PaymentIntent;
@@ -86,21 +88,23 @@ public function complete(Request $request, $id)
 
 
 
-   public function pay($offer,Request $request)
+   public function pay($offer, Request $request)
 {
-$request->validate([
-    'amount' => 'required|numeric|min:1,max:9000000',
-    'cvc'=>'required|numeric|digits:3',
-    'account_number'=>'required|numeric|digits:16'
+    $request->validate([
+        'amount' => 'required|numeric|min:1',
+        'account_number' => 'required|numeric'
+    ]);
+
+    $offer = ServiceOffer::findOrFail($offer);
+
+    $payment = app(PaymentService::class)->pay($offer, $request->amount);
+
+    return response()->json([
+    'message' => 'قم بالتحويل واكتب reference في الملاحظة',
+    'payment_id' => $payment->id,
+    'amount_syp' => $payment->amount_syp,
+    'reference' => $payment->reference 
 ]);
-    $price = $request->amount;
-    $offer2 = ServiceOffer::findOrFail($offer);
-    $payment = app(\App\Services\PaymentService::class)
-        ->pay($offer2,$price);
-
-    
-
-    return ApiResponse::success($payment);
 }
    public function rejectPrice(Request $request, $id)
 {
@@ -170,6 +174,53 @@ public function recommend(Request $request)
             $request->category_id
         )
 );
+}
+public function verifyPayment($paymentId)
+{
+    $payment = Payment::findOrFail($paymentId);
+
+    if ($payment->status !== 'pending') {
+        return response()->json(['message' => 'Payment already processed']);
+    }
+
+    $shamcash = app(ShamCashService::class);
+
+    $accountId = config('services.shamcash.account_id');
+
+    $transactions = $shamcash->getTransactions($accountId, [
+        'limit' => 50
+    ]);
+
+    foreach ($transactions['data']['transactions'] ?? [] as $tx) {
+
+        if (
+            abs($tx['amount'] - $payment->amount_syp) < 0.0001 &&
+            isset($tx['note']) &&
+            $tx['note'] == $payment->reference &&
+            \Carbon\Carbon::parse($tx['occurred_at'])->gt($payment->created_at)
+        ) {
+
+            $payment->update(['status' => 'paid']);
+
+            $offer = $payment->offer;
+
+            $offer->update([
+                'status' => 'waiting_for_rating'
+            ]);
+
+            app(\App\Services\chat\ChatService::class)
+                ->closeConversation($offer->service_request_id);
+
+            return response()->json([
+                'message' => 'Payment verified & chat closed',
+                'payment' => $payment
+            ]);
+        }
+    }
+
+    return response()->json([
+        'message' => 'لم يتم العثور على عملية الدفع'
+    ], 400);
 }
 }
 

@@ -12,9 +12,12 @@ class Payment extends Model
         'service_request_id',
         'user_id',
         'provider_id',
-        'stripe_session_id',
+        'reference',
         'amount_syp',
-        'amount_usd',
         'status'
     ];
+    public function offer()
+{
+    return $this->belongsTo(ServiceOffer::class, 'service_offer_id');
+}
 }

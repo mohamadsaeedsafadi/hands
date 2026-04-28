@@ -3,37 +3,38 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProfileService;
 use Illuminate\Http\Request;
+use App\Services\ProfileService;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
-    public function __construct(protected ProfileService $service) {}
+    protected $service;
 
-    public function me(Request $request)
+    public function __construct(ProfileService $service)
+    {
+        $this->service = $service;
+    }
+
+    public function me()
     {
         return response()->json(
-            $this->service->getMyProfile($request->user())
+            $this->service->getProfile(Auth::user()->id)
         );
     }
 
     public function update(Request $request)
     {
         $data = $request->validate([
-            'image' => 'nullable|image',
-            'phone' => 'nullable|string|max:20',
-            'city' => 'nullable|string|max:100',
-            'address' => 'nullable|string|max:255',
-            'bio' => 'nullable|string',
-            'skills' => 'nullable|array'
+            'image' => 'nullable|image|max:2048',
+            'city' => 'nullable|string',
+            'location' => 'nullable|string',
+            'bio' => 'nullable|string'
         ]);
 
-        $profile = $this->service->updateProfile(
-            $request->user(),
-            $data
+        return response()->json(
+            $this->service->updateProfile(Auth::user(), $data)
         );
-
-        return response()->json($profile);
     }
     public function updateLocation(Request $request)
 {

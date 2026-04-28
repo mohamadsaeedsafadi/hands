@@ -5,14 +5,16 @@ use App\Models\Profile;
 
 class ProfileRepository
 {
-    public function getByUser($userId)
+     public function updateOrCreate($userId, $data)
     {
-        return Profile::where('user_id', $userId)->first();
+        return Profile::updateOrCreate(
+            ['user_id' => $userId],
+            $data
+        );
     }
 
-    public function update(Profile $profile, $data)
+    public function getByUserId($userId)
     {
-        $profile->update($data);
-        return $profile;
+        return Profile::where('user_id', $userId)->first();
     }
 }

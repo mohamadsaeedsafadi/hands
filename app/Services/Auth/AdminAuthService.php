@@ -47,6 +47,7 @@ class AdminAuthService
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => config('jwt.ttl') ,
+            'role'=>$admin->role
         ];
     }
 }

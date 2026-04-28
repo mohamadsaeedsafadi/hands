@@ -3,25 +3,39 @@
 namespace App\Services;
 
 use App\Repositories\ProfileRepository;
+use Illuminate\Support\Facades\Cache;
 
 class ProfileService
 {
-    public function __construct(protected ProfileRepository $repo) {}
+    protected $repo;
 
-    public function getMyProfile($user)
+    public function __construct(ProfileRepository $repo)
     {
-        return $this->repo->getByUser($user->id);
+        $this->repo = $repo;
+    }
+
+    private function cacheKey($userId)
+    {
+        return "profile_user_{$userId}";
+    }
+
+    public function getProfile($userId)
+    {
+        return Cache::remember($this->cacheKey($userId), 3600, function () use ($userId) {
+            return $this->repo->getByUserId($userId);
+        });
     }
 
     public function updateProfile($user, $data)
     {
-        $profile = $this->repo->getByUser($user->id);
-
-        
         if (isset($data['image'])) {
             $data['image'] = $data['image']->store('profiles', 'public');
         }
 
-        return $this->repo->update($profile, $data);
+        $profile = $this->repo->updateOrCreate($user->id, $data);
+
+        Cache::forget($this->cacheKey($user->id));
+
+        return $profile;
     }
 }

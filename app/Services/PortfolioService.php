@@ -3,60 +3,75 @@
 namespace App\Services;
 
 use App\Repositories\PortfolioRepository;
+use Illuminate\Support\Facades\Cache;
 
 class PortfolioService
 {
-    public function __construct(protected PortfolioRepository $repo) {}
+    protected $repo;
 
-    public function create($user, $data)
+    public function __construct(PortfolioRepository $repo)
     {
-        if ($user->role !== 'provider') {
-            throw new \Exception("Only providers can add portfolio");
-        }
-
-        if (isset($data['image'])) {
-            $data['image'] = $data['image']->store('portfolios', 'public');
-        }
-
-        $data['user_id'] = $user->id;
-
-        return $this->repo->create($data);
+        $this->repo = $repo;
     }
 
-    public function myPortfolios($user)
+    private function cacheKey($userId)
     {
-        return $this->repo->getByUser($user->id);
+        return "portfolio_user_{$userId}";
     }
 
-    public function update($user, $id, $data)
+    public function getUserPortfolio($userId)
     {
-        $portfolio = $this->repo->find($id);
-
-        if ($portfolio->user_id !== $user->id) {
-            throw new \Exception("Unauthorized");
-        }
-
-        if (isset($data['image'])) {
-            $data['image'] = $data['image']->store('portfolios', 'public');
-        }
-
-        return $this->repo->update($portfolio, $data);
+        return Cache::remember($this->cacheKey($userId), 3600, function () use ($userId) {
+            return $this->repo->getByUser($userId);
+        });
     }
 
-    public function delete($user, $id)
+    public function createPortfolio($user, $data)
     {
-        $portfolio = $this->repo->find($id);
+        $portfolio = $this->repo->create([
+            'user_id' => $user->id,
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null
+        ]);
 
-        if ($portfolio->user_id !== $user->id) {
-            throw new \Exception("Unauthorized");
+        if (!empty($data['images'])) {
+            foreach ($data['images'] as $img) {
+                $portfolio->images()->create([
+                    'image' => $img->store('portfolio', 'public')
+                ]);
+            }
         }
+
+        Cache::forget($this->cacheKey($user->id));
+
+        return $portfolio->load('images');
+    }
+
+    public function updatePortfolio($portfolio, $data)
+    {
+        $portfolio->update($data);
+
+        if (!empty($data['images'])) {
+            foreach ($data['images'] as $img) {
+                $portfolio->images()->create([
+                    'image' => $img->store('portfolio', 'public')
+                ]);
+            }
+        }
+
+        Cache::forget($this->cacheKey($portfolio->user_id));
+
+        return $portfolio->load('images');
+    }
+
+    public function deletePortfolio($portfolio)
+    {
+        $userId = $portfolio->user_id;
 
         $this->repo->delete($portfolio);
-    }
 
-    
-    public function getProviderPortfolios($providerId)
-    {
-        return $this->repo->getByUser($providerId);
+        Cache::forget($this->cacheKey($userId));
+
+        return true;
     }
 }

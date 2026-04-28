@@ -3,56 +3,78 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\PortfolioService;
 use Illuminate\Http\Request;
+use App\Services\PortfolioService;
+use App\Models\Portfolio;
+use Illuminate\Support\Facades\Auth;
+
 class PortfolioController extends Controller
 {
-    public function __construct(protected PortfolioService $service) {}
+    protected $service;
+
+    public function __construct(PortfolioService $service)
+    {
+        $this->service = $service;
+    }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|string',
             'description' => 'nullable|string',
-            'image' => 'required|image'
+            'images' => 'required|array',
+            'images.*' => 'image|max:2048'
         ]);
 
         return response()->json(
-            $this->service->create($request->user(), $data)
+            $this->service->createPortfolio(Auth::user(), $data)
         );
     }
 
-    public function my(Request $request)
+    public function my()
     {
         return response()->json(
-            $this->service->myPortfolios($request->user())
+            $this->service->getUserPortfolio(Auth::user()->id)
         );
     }
 
-    public function update(Request $request, $id)
+    public function provider($id)
     {
+        return response()->json(
+            $this->service->getUserPortfolio($id)
+        );
+    }
+
+    public function update($id, Request $request)
+    {
+        $portfolio = Portfolio::findOrFail($id);
+
+        if ($portfolio->user_id !== Auth::user()->id) {
+            throw new \Exception("Unauthorized");
+        }
+
         $data = $request->validate([
-            'title' => 'sometimes|string|max:255',
+            'title' => 'nullable|string',
             'description' => 'nullable|string',
-            'image' => 'nullable|image'
+            'images' => 'nullable|array',
+            'images.*' => 'image|max:2048'
         ]);
 
         return response()->json(
-            $this->service->update($request->user(), $id, $data)
+            $this->service->updatePortfolio($portfolio, $data)
         );
     }
 
-    public function delete(Request $request, $id)
+    public function delete($id)
     {
-        $this->service->delete($request->user(), $id);
+        $portfolio = Portfolio::findOrFail($id);
 
-        return response()->json(['message' => 'Deleted']);
-    }
+        if ($portfolio->user_id !== Auth::user()->id) {
+            throw new \Exception("Unauthorized");
+        }
 
-    public function provider($providerId)
-    {
         return response()->json(
-            $this->service->getProviderPortfolios($providerId)
+            $this->service->deletePortfolio($portfolio)
         );
     }
 }
