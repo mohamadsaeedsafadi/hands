@@ -17,9 +17,8 @@ return new class extends Migration
     $table->foreignId('service_request_id')->constrained()->cascadeOnDelete();
     $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
     $table->foreignId('provider_id')->constrained('users')->cascadeOnDelete();
-    $table->string('stripe_session_id')->unique();
     $table->decimal('amount_syp', 12, 2);
-    $table->decimal('amount_usd', 12, 2);
+    $table->string('reference')->nullable();
     $table->string('status')->default('pending'); // pending, paid, failed
     $table->timestamps();
 });

@@ -11,21 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profiles', function (Blueprint $table) {
+   Schema::create('profiles', function (Blueprint $table) {
     $table->id();
-
-    $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
-
+    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
     $table->string('image')->nullable();
-    $table->string('phone')->nullable();
     $table->string('city')->nullable();
-    $table->string('address')->nullable();
-
+    $table->string('location')->nullable();
     $table->text('bio')->nullable();
-
-    
-    $table->json('skills')->nullable();
-
+    $table->json('extra')->nullable(); 
     $table->timestamps();
 });
     }

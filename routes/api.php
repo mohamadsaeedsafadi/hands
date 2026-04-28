@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\TicketController;
 use App\Http\Controllers\Api\V1\VerificationController as V1VerificationController;
 use App\Http\Controllers\StripeWebhookController;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,7 +112,7 @@ Route::get('/categories_questions/{id}',[CategoryController::class,'categoryQues
         Route::post('offers/{id}/approve-price', [ServiceOfferController::class, 'approvePrice']);
 
         Route::post('offers/{id}/pay', [ServiceOfferController::class, 'pay']);
-
+Route::post('payments/{id}/verify', [ServiceOfferController::class, 'verifyPayment']);
         Route::post('provider/categories', [ServiceOfferController::class, 'updateCategories']);
 Route::post('rejectPrice/{id}', [ServiceOfferController::class, 'rejectPrice']);
 Route::post('updatePrice/{id}', [ServiceOfferController::class, 'updatePrice']);
@@ -219,5 +220,5 @@ Route::get('banned-users', [BanController::class, 'bannedUsers']);
 });
 
 
-
+Broadcast::routes(['prefix'=>'v1','middleware'=>['auth:user_api', 'check.ban']]);
 
