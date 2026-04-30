@@ -35,7 +35,7 @@ class CategoryManagementController extends Controller
     public function update($id, Request $request)
     {
         $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
+            'name' => 'nullable|string|max:255',
             'parent_id' => 'nullable|exists:service_categories,id'
         ]);
 

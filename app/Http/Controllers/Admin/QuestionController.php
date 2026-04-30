@@ -46,11 +46,11 @@ class QuestionController extends Controller
     public function update($id, Request $request)
 {
     $data = $request->validate([
-        'category_id' => 'sometimes|exists:service_categories,id',
-        'question' => 'sometimes|string',
-        'type' => 'sometimes|in:text,number,select,multi_select,image',
+        'category_id' => 'nullable|exists:service_categories,id',
+        'question' => 'nullable|string',
+        'type' => 'nullable|in:text,number,select,multi_select,image',
         'options' => 'nullable|array',
-        'is_required' => 'boolean'
+        'is_required' => 'nullable|boolean'
     ]);
 
    

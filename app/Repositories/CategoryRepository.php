@@ -61,7 +61,7 @@ public function getSubCategories($parentId)
     {
         $cat = ServiceCategory::findOrFail($id);
 
-        // 🔥 مهم: منع حذف فئة لديها أبناء
+        
         if ($cat->children()->exists()) {
             throw new \Exception("Cannot delete category with children");
         }
