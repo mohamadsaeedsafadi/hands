@@ -9,7 +9,8 @@ use App\Services\chat\ChatService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-
+use App\Services\NotificationService;
+use App\Enums\NotificationType;
 class ServiceOfferService
 {
     protected $offerRepo;
@@ -83,6 +84,14 @@ $this->clearOfferCache($offer->serviceRequest->user_id);
     $offer->serviceRequest
 );
 
+
+NotificationService::send(
+    $offer->provider,
+    "تم قبول العرض",
+    "تم قبول عرضك على الطلب",
+    NotificationType::OFFER_ACCEPTED,
+    ['order_id' => $offer->id]
+);
    return [
     'offer' => $offer,
     'conversation_id' => $conversation->id
@@ -111,6 +120,15 @@ if ($offer->status !== 'accepted' && $offer->status !== 'in_progress') {
                 'status' => 'awaiting_payment'
             ]);
         }
+        $user = $offer->serviceRequest->user;
+
+NotificationService::send(
+    $user,
+    "تحديث الطلب",
+    "تم تغيير حالة الطلب إلى {$offer->status}",
+    NotificationType::ORDER_STATUS_CHANGED,
+    ['order_id' => $offer->id]
+);
 
         return $offer;
     }
@@ -123,6 +141,15 @@ if ($offer->status !== 'accepted' && $offer->status !== 'in_progress') {
         }
 
         $this->repo->update($offer, ['status' => 'awaiting_payment']);
+       $user = $offer->serviceRequest->user;
+
+NotificationService::send(
+    $user,
+    "تحديث الطلب",
+    "تم تغيير حالة الطلب إلى {$offer->status}",
+    NotificationType::ORDER_STATUS_CHANGED,
+    ['order_id' => $offer->id]
+);
         return $offer;
     }
 
@@ -145,7 +172,12 @@ if ($offer->status !== 'accepted' && $offer->status !== 'in_progress') {
     $this->repo->update($offer, [
         'status' => 'price_rejected'
     ]);
-
+NotificationService::send(
+    $offer->provider,
+    "تم رفض السعر",
+    "قام المستخدم برفض السعر",
+    NotificationType::NEW_FINAL_PRICE
+);
     return $offer;
 }
 public function updateFinalPrice($provider, $offerId, $newPrice)
@@ -180,7 +212,12 @@ public function updateFinalPrice($provider, $offerId, $newPrice)
             'status' => 'awaiting_payment'
         ]);
     }
-
+NotificationService::send(
+    $offer->serviceRequest->user,
+    "سعر جديد",
+    "تم إرسال سعر جديد",
+    NotificationType::NEW_FINAL_PRICE
+);
     return $offer;
 }
 public function startService($provider, $offerId)
@@ -198,7 +235,12 @@ public function startService($provider, $offerId)
     $this->repo->update($offer, [
         'status' => 'in_progress'
     ]);
-
+NotificationService::send(
+    $offer->serviceRequest->user,
+    "بدأ التنفيذ",
+    "تم بدء تنفيذ الطلب",
+    NotificationType::ORDER_STATUS_CHANGED
+);
     return $offer;
 }
 public function myoffer($request)
@@ -249,6 +291,6 @@ public function recommendProviders($user, $categoryId)
 }
 private function clearOfferCache($userId)
 {
-    Cache::flush(); 
+    Cache::forget("offers.my.$userId");
 }
 }

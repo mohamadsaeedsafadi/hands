@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Repositories\VerificationRepository;
 class VerificationService
 {
@@ -45,6 +46,12 @@ class VerificationService
         $request->user->update([
             'provider_verified_at' => now()
         ]);
+        NotificationService::send(
+    $user = $request->user,
+    "تم التوثيق",
+    "تم توثيق حسابك بنجاح",
+    NotificationType::ACCOUNT_VERIFIED
+);
 
         return $request;
     }
