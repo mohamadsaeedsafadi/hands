@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Notifications\Notifiable;
 use App\Traits\AuditTrait;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
+    use Notifiable;
     protected $fillable = [
         'name',
         'email',
@@ -22,7 +23,8 @@ class User extends Authenticatable implements JWTSubject
         'rating_avg',
         'ratings_count',
         'lat',
-        'lng'
+        'lng',
+        'password_changed_at'
 
     ];
     protected $hidden = [
@@ -34,6 +36,7 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at'     => 'datetime',
         'provider_verified_at'  => 'datetime',
         'locked_until'          => 'datetime',
+        'password_changed_at'   => 'datetime',
     ];
 
     /* ================= JWT ================= */

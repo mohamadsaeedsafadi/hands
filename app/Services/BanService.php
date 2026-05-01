@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Models\Report;
 use App\Models\UserBan;
 use Illuminate\Support\Facades\Cache;
@@ -20,6 +21,12 @@ class BanService
         throw new \Exception('User already banned');
     }
 Cache::forget("admin:banned_users:v1");
+NotificationService::send(
+    $user = \App\Models\User::findOrFail($userId),
+    "تم الحظر",
+    "تم حظر حسابك",
+    NotificationType::ACCOUNT_BLOCKED
+);
     return UserBan::create([
         'user_id' => $userId,
         'admin_id' => $admin->id,
@@ -35,7 +42,14 @@ Cache::forget("admin:banned_users:v1");
         UserBan::where('user_id', $userId)
             ->where('is_active', true)
             ->update(['is_active' => false]);
+$user = \App\Models\User::find($userId);
 
+NotificationService::send(
+    $user,
+    "تم فك الحظر",
+    "تم إلغاء الحظر عن حسابك",
+    NotificationType::ACCOUNT_UNBLOCKED
+);
         return true;
     }
 

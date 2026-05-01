@@ -31,6 +31,7 @@ class UserRegisterService
             'email_verified_at'        => null,
             'failed_attempts'          => 0,
             'locked_until'             => null,
+            'password_changed_at' => now(),
         ]);
 
        

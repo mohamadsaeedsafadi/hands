@@ -31,12 +31,18 @@ class UserAuthController extends Controller
         }
     }
 
-    public function refresh()
-    {
+  public function refresh()
+{
+    try {
         return response()->json(
             $this->authService->refresh()
         );
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => $e->getMessage()
+        ], 401);
     }
+}
   public function verifyEmail(Request $request)
 {
     $request->validate([

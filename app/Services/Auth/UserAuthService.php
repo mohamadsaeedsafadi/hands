@@ -61,22 +61,33 @@ class UserAuthService
     auth()->shouldUse('user_api');
 
     $token = JWTAuth::fromUser($user);
-$userrole = $user->role;
-    return [$this->respondWithToken($token),"role:$userrole"];
+    $mustChangePassword = false;
+
+if ($user->password_changed_at) {
+    $mustChangePassword = $user->password_changed_at->diffInDays(now()) >= 90;
+    
 }
 
-    public function refresh(): array
-    {
-        auth()->shouldUse('user_api');
+$userrole = $user->role;
+      return [
+    'token' => $this->respondWithToken($token),
+    'role' => $user->role,
+    'must_change_password' => $mustChangePassword
+];
+}
 
-        try {
-            $token = JWTAuth::refresh(JWTAuth::getToken());
-        } catch (JWTException $e) {
-            throw new \Exception('Token refresh failed');
-        }
+  public function refresh(): array
+{
+    auth()->shouldUse('user_api');
 
-        return $this->respondWithToken($token);
+    try {
+        $newToken = auth('user_api')->refresh();
+    } catch (\Exception $e) {
+        throw new \Exception('Refresh token expired');
     }
+
+        return [$this->respondWithToken($newToken)];
+}
 
     protected function respondWithToken(string $token): array
     {
