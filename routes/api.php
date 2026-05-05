@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\Admin\AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\AdminManagementController;
 use App\Http\Controllers\Api\V1\Admin\CategoryManagementController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RatingController;
@@ -136,7 +137,8 @@ Route::get('providers/nearby', [ServiceOfferController::class, 'nearby']);
 Route::get('offers/nearby', [ServiceOfferController::class, 'nearbyOffers']);
 Route::get('providers/recommend', [ServiceOfferController::class, 'recommend']);
 Route::post('set/location', [ProfileController::class, 'updateLocation']);
-
+Route::get('provider/categories', [ServiceOfferController::class, 'myCategories']);
+Route::get('provider/{id}/categories', [ServiceOfferController::class, 'providerCategories']);
 Route::prefix('tickets')->group(function () {
     Route::post('', [TicketController::class, 'create']);
     Route::get('/{reference}', [TicketController::class, 'show']);
@@ -150,6 +152,16 @@ Route::prefix('tickets')->group(function () {
 
 Route::prefix('reports')->group(function () {
     Route::post('', [ReportController::class, 'store']);
+    
+});
+Route::prefix('notifications')->group(function () {
+  Route::get('', [NotificationController::class, 'index']);
+
+    Route::get('/unread', [NotificationController::class, 'unread']);
+
+    Route::post('/read', [NotificationController::class, 'markAsRead']);
+
+    Route::post('/{id}/read', [NotificationController::class, 'markOneAsRead']);
     
 });
 
@@ -174,7 +186,7 @@ Route::get('/logs', [AuditController::class, 'index']);
 
             Route::get('dashboard', [AnalyticsController::class, 'dashboard']); 
             Route::get('export', [AnalyticsController::class, 'export']);
-             Route::get('admin/verifications', [AdminVerificationController::class, 'pending']);
+             Route::get('verifications', [AdminVerificationController::class, 'pending']);
     Route::post('verifications/{id}/approve', [AdminVerificationController::class, 'approve']);
     Route::post('verifications/{id}/reject', [AdminVerificationController::class, 'reject']);
        
