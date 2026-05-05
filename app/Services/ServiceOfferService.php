@@ -58,6 +58,10 @@ $this->clearOfferCache($provider->id);
         'provider_verified_at' => null
     ]);
 }
+public function getProviderCategories($provider)
+{
+    return $provider->categories()->get();
+}
 public function acceptOffer(ServiceOffer $offer)
 {
     $offer->load(['serviceRequest', 'provider']);
