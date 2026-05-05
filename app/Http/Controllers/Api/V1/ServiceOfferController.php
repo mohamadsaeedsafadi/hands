@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\Payment;
 use App\Models\ServiceOffer;
+use App\Models\User;
 use App\Services\chat\ChatService;
 use App\Services\ServiceOfferService;
 use Illuminate\Http\Request;
@@ -79,7 +80,20 @@ public function complete(Request $request, $id)
         return ApiResponse::success($offer, 'Service completed');
     }
 
-    
+    public function myCategories(Request $request)
+{
+    $categories = $this->service->getProviderCategories($request->user());
+
+    return ApiResponse::success($categories);
+}
+public function providerCategories($id)
+{
+    $provider = User::findOrFail($id);
+
+    $categories = $this->service->getProviderCategories($provider);
+
+    return ApiResponse::success($categories);
+}
     public function approvePrice(Request $request, $id)
     {
         $offer = $this->service->userApprovePrice($request->user(), $id);
