@@ -39,7 +39,8 @@ $table->decimal('lng', 10, 7)->nullable();
 $table->timestamp('password_changed_at')->nullable();
 
     // provider only
-   
+       $table->decimal('wallet_balance', 15, 2)->default(0);
+
     $table->float('rating_avg')->default(0);
     $table->integer('ratings_count')->default(0);
             $table->timestamps();
