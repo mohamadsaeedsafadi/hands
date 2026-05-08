@@ -221,6 +221,9 @@ public function verifyPayment($paymentId)
             $offer->update([
                 'status' => 'waiting_for_rating'
             ]);
+            $provider = $offer->provider;
+
+$provider->increment('wallet_balance', $payment->amount_syp);
 
             app(\App\Services\chat\ChatService::class)
                 ->closeConversation($offer->service_request_id);

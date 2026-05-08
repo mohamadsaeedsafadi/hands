@@ -24,7 +24,8 @@ class User extends Authenticatable implements JWTSubject
         'ratings_count',
         'lat',
         'lng',
-        'password_changed_at'
+        'password_changed_at',
+        'wallet_balance'
 
     ];
     protected $hidden = [
@@ -133,5 +134,9 @@ public function profile()
 public function portfolios()
 {
     return $this->hasMany(Portfolio::class);
+}
+public function withdrawalRequests()
+{
+    return $this->hasMany(WithdrawalRequest::class, 'provider_id');
 }
 }
