@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\Admin\AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\AdminManagementController;
 use App\Http\Controllers\Api\V1\Admin\CategoryManagementController;
+use App\Http\Controllers\Api\V1\Cashier\CashierAuthController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PortfolioController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -29,6 +30,7 @@ use App\Http\Controllers\Api\V1\RatingController;
 use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\TicketController;
 use App\Http\Controllers\Api\V1\VerificationController as V1VerificationController;
+use App\Http\Controllers\Api\V1\WithdrawalController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Broadcast;
 
@@ -146,8 +148,11 @@ Route::prefix('tickets')->group(function () {
         Route::get('/messages/{id}', [TicketController::class, 'messages']);
 
 
-
 });
+
+ Route::post('withdrawals', [WithdrawalController::class, 'store']);
+
+    Route::get('withdrawals/my', [WithdrawalController::class, 'my']);
 
 
 Route::prefix('reports')->group(function () {
@@ -182,6 +187,7 @@ Route::get('/logs', [AuditController::class, 'index']);
     Route::get('/logs/{id}', [AuditController::class, 'show']);
     Route::get('/stats', [AuditController::class, 'stats']);
             Route::post('create', [AdminManagementController::class, 'store']);
+             Route::post('create/cashier', [AdminManagementController::class, 'createCashier']);
             Route::get('me', fn () => response()->json(Auth::user()));
 
             Route::get('dashboard', [AnalyticsController::class, 'dashboard']); 
@@ -202,7 +208,16 @@ Route::get('categoriey/main',[CategoryController::class,'mainCategories']);
 Route::get('categories/{id}/sub',[CategoryController::class,'subCategories']);
 
 Route::get('categories_questions/{id}',[CategoryController::class,'categoryQuestions']);
+   Route::get('/admins', [AdminManagementController::class, 'admins']);
 
+    Route::put('/admins/{id}', [AdminManagementController::class, 'updateAdmin']);
+
+    Route::delete('/admins/{id}', [AdminManagementController::class, 'deleteAdmin']);
+     Route::get('/cashiers', [AdminManagementController::class, 'cashiers']);
+
+    Route::put('/cashiers/{id}', [AdminManagementController::class, 'updateCashier']);
+
+    Route::delete('/cashiers/{id}', [AdminManagementController::class, 'deleteCashier']);
 
 Route::prefix('tickets')->group(function () {
     Route::post('/{ticketId}/reply', [TicketController::class, 'reply']);
@@ -230,7 +245,27 @@ Route::get('banned-users', [BanController::class, 'bannedUsers']);
     });
 
 });
+ Route::post('cashier/login', [CashierAuthController::class, 'login']);
+Route::prefix('cashier')
+    ->middleware('auth:cashier_api')
+    ->group(function () {
 
+        Route::get(
+            '/withdrawals',
+            [WithdrawalController::class, 'pending']
+        );
+
+        Route::post(
+            '/withdrawals/{id}/approve',
+            [WithdrawalController::class, 'approve']
+        );
+
+        Route::post(
+            '/withdrawals/{id}/reject',
+            [WithdrawalController::class, 'reject']
+        );
+        
+    });
 
 Broadcast::routes(['prefix'=>'v1','middleware'=>['auth:user_api', 'check.ban']]);
 
