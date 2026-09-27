@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\PortfolioService;
 use App\Models\Portfolio;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class PortfolioController extends Controller
@@ -77,4 +78,5 @@ class PortfolioController extends Controller
             $this->service->deletePortfolio($portfolio)
         );
     }
+   
 }

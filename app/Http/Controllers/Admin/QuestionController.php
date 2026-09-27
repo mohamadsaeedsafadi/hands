@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\ServiceQuestion;
 use App\Services\Admin\AdminQuestionService;
+use App\Services\QuestionService;
 use Illuminate\Http\Request;
 class QuestionController extends Controller
 {
     protected $service;
 
-    public function __construct(AdminQuestionService $service)
+    public function __construct(QuestionService $service)
     {
         $this->service = $service;
     }

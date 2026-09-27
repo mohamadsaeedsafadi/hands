@@ -12,4 +12,6 @@ class NotificationType
     const ACCOUNT_VERIFIED = 'account_verified';
     const ACCOUNT_BLOCKED = 'account_blocked';
     const ACCOUNT_UNBLOCKED = 'account_unblocked';
+    const NEW_SERVICE_REQUEST = 'new_service_request'; 
+    const NEW_OFFER_RECEIVED = 'new_offer_received';
 }

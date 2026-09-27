@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\WithdrawalRequest;
 use App\Services\WithdrawalService;
 use Illuminate\Http\Request;
@@ -79,7 +80,13 @@ public function reject($id, Request $request)
 }
 public function my(){
     $x= Auth::user()->id;
-   return  WithdrawalRequest::where('provider_id',$x)->paginate(10);
+   return response()->json([WithdrawalRequest::where('provider_id',$x)->paginate(10)]);
 
 }
+public function my_wallet(){
+    $x= Auth::user()->id;
+   return response()->json([ User::where('id',$x)->get('wallet_balance')]);
+
+}
+
 }

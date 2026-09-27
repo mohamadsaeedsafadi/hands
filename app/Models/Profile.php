@@ -12,7 +12,9 @@ class Profile extends Model
         'city',
         'location',
         'bio',
-        'extra'
+        'extra',
+        'phone',
+        'name'
     ];
 
     protected $casts = [

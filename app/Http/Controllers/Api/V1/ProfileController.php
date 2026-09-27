@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\ProfileService;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,8 @@ class ProfileController extends Controller
             'image' => 'nullable|image|max:2048',
             'city' => 'nullable|string',
             'location' => 'nullable|string',
-            'bio' => 'nullable|string'
+            'bio' => 'nullable|string',
+            'phone'=>'nullable|digits_between:7,10'
         ]);
 
         return response()->json(
@@ -49,4 +51,9 @@ class ProfileController extends Controller
 
     return response()->json(['message' => 'Location updated']);
 }
+
+ public function return_address(){
+$x =Auth::user()->id;
+return response()->json( User::where('id',$x)->get(['lng','lat']));
+    }
 }

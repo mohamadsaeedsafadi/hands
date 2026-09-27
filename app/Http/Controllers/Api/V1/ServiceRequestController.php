@@ -41,5 +41,22 @@ class ServiceRequestController extends Controller
         )
 );
 }
+public function accepted(Request $request)
+{
+    return ApiResponse::success(
 
+        $this->service->acceptedRequests(
+            $request->user()
+        )
+    );
+}
+public function rejected(Request $request)
+{
+    return ApiResponse::success(
+
+        $this->service->rejected(
+            $request->user()
+        )
+    );
+}
 }

@@ -70,4 +70,9 @@ class TicketController extends Controller
     $messages = $this->ticketService->getTicketMessages($ticketId);
     return ApiResponse::success($messages);
 }
+public function seeall()
+{
+       $ticket = $this->ticketService->getall();
+        return ApiResponse::success($ticket);
+}
 }

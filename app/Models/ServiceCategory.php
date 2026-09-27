@@ -30,4 +30,8 @@ class ServiceCategory extends Model
         'provider_id'
     );
 }
+public function requests()
+{
+    return $this->hasMany(ServiceRequest::class, 'category_id');
+}
 }
