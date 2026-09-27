@@ -14,8 +14,19 @@ return new class extends Migration
        Schema::create('audit_logs', function (Blueprint $table) {
     $table->id();
 
-    $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+   /*  $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete(); */
+$table->string('user_email')->nullable();
 
+        $table->string('user_type')->nullable();
+        // user / admin / cashier
+
+        $table->string('guard')->nullable();
+
+        $table->boolean('success')->default(true);
+
+        $table->text('description')->nullable();
+
+        $table->timestamp('executed_at')->nullable();
     $table->string('action'); // create, update, delete, login...
     $table->string('model_type')->nullable(); // App\Models\ServiceOffer
     $table->unsignedBigInteger('model_id')->nullable();

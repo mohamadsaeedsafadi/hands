@@ -956,7 +956,7 @@ private function questionsTranslation($id)
         ],
         [
             'question' => 'أرفق الملف',
-            'type' => 'image', // أو file مستقبلاً
+            'type' => 'image', 
             'is_required' => false,
         ],
 
@@ -1153,7 +1153,7 @@ private function questionsPhotography($id)
         ['q'=>'ما موقع التصوير؟','type'=>'text'],
         ['q'=>'ما تاريخ المناسبة؟','type'=>'text'],
 
-        // 🔥 صورة
+        
         ['q'=>'أرفق مثال للصورة المطلوبة','type'=>'image','required'=>false],
 
     ];
@@ -1180,7 +1180,7 @@ private function questionsEvent($id)
         ['q'=>'ما موقع الحفل؟','type'=>'text'],
         ['q'=>'ما تاريخ الحفل؟','type'=>'text'],
 
-        // 🔥 صورة
+        
         ['q'=>'أرفق صورة للديكور المطلوب','type'=>'image','required'=>false],
 
     ];
@@ -1207,7 +1207,7 @@ private function questionsDelivery($id)
         ['q'=>'هل الدفع عند الاستلام؟','type'=>'select','options'=>['نعم','لا']],
         ['q'=>'ما الوقت المطلوب للتوصيل؟','type'=>'text'],
 
-        // 🔥 صورة
+        
         ['q'=>'أرفق صورة للطلب','type'=>'image','required'=>false],
 
     ];
@@ -1234,7 +1234,7 @@ private function questionsMoving($id)
         ['q'=>'من أين سيتم النقل؟','type'=>'text'],
         ['q'=>'إلى أين سيتم النقل؟','type'=>'text'],
 
-        // 🔥 صورة
+        
         ['q'=>'أرفق صور للأثاث','type'=>'image','required'=>false],
 
     ];
@@ -1260,7 +1260,7 @@ private function questionsGuard($id)
         ['q'=>'ما مدة الحراسة المطلوبة (بالأيام)؟','type'=>'number'],
         ['q'=>'ما موقع المكان؟','type'=>'text'],
 
-        // 🔥 صورة
+       
         ['q'=>'أرفق صورة للمكان','type'=>'image','required'=>false],
 
     ];
@@ -1286,7 +1286,7 @@ private function questionsPet($id)
         ['q'=>'كم مدة الرعاية؟','type'=>'number'],
         ['q'=>'ما موقع الخدمة؟','type'=>'text'],
 
-        // 🔥 صورة
+        
         ['q'=>'أرفق صورة للحيوان','type'=>'image','required'=>false],
 
     ];
@@ -1313,7 +1313,7 @@ private function questionsTailor($id)
         ['q'=>'كم عدد القطع؟','type'=>'number'],
         ['q'=>'ما موعد التسليم المطلوب؟','type'=>'text'],
 
-        // 🔥 صورة
+      
         ['q'=>'أرفق صورة للتصميم المطلوب','type'=>'image','required'=>false],
 
     ];
@@ -1342,7 +1342,7 @@ private function questionsAppliance($id)
         ['q'=>'هل تم إصلاح الجهاز سابقاً؟','type'=>'select','options'=>['نعم','لا']],
         ['q'=>'هل الجهاز داخل الضمان؟','type'=>'select','options'=>['نعم','لا']],
 
-        // 🔥 أهم شيء هنا
+        
         ['q'=>'أرفق صورة أو فيديو للمشكلة','type'=>'image','required'=>false],
 
     ];

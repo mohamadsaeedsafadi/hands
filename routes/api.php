@@ -20,7 +20,10 @@ use App\Http\Controllers\Api\V1\ServiceOfferController;
 use App\Http\Controllers\Api\V1\ChatController;
 
 use App\Http\Controllers\Api\V1\Admin\AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\AdminBackupController;
 use App\Http\Controllers\Api\V1\Admin\AdminManagementController;
+use App\Http\Controllers\Api\V1\Admin\AdminReportController;
+use App\Http\Controllers\Api\V1\Admin\AdminStatisticsController;
 use App\Http\Controllers\Api\V1\Admin\CategoryManagementController;
 use App\Http\Controllers\Api\V1\Cashier\CashierAuthController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -103,6 +106,8 @@ Route::get('/categories_questions/{id}',[CategoryController::class,'categoryQues
         // ========================
         Route::post('service-requests', [ServiceRequestController::class, 'store']);
         Route::get('provider/requests', [ServiceRequestController::class, 'availableRequests']);
+        Route::get('accepted', [ServiceRequestController::class, 'accepted']);
+        Route::get('rejected', [ServiceRequestController::class, 'rejected']);
  Route::post('/offers/{offer}/rate', [RatingController::class,'rate']);
         // ========================
         // Service Offers
@@ -125,6 +130,7 @@ Route::post('updatePrice/{id}', [ServiceOfferController::class, 'updatePrice']);
         Route::post('chat/{conversationId}/send', [ChatController::class, 'send']);
         Route::get('chat/{conversationId}/messages', [ChatController::class, 'messages']);
 Route::get('profile', [ProfileController::class, 'me']);
+Route::get('profile/address', [ProfileController::class, 'return_address']);
     Route::post('profile/update', [ProfileController::class, 'update']);
 
     // Portfolio
@@ -149,11 +155,12 @@ Route::prefix('tickets')->group(function () {
 
 
 });
+  Route::get('/seeall', [TicketController::class, 'seeall']);
 
  Route::post('withdrawals', [WithdrawalController::class, 'store']);
 
     Route::get('withdrawals/my', [WithdrawalController::class, 'my']);
-
+  Route::get('wallet/my', [WithdrawalController::class, 'my_wallet']);
 
 Route::prefix('reports')->group(function () {
     Route::post('', [ReportController::class, 'store']);
@@ -231,8 +238,32 @@ Route::prefix('tickets')->group(function () {
 Route::prefix('reports')->group(function () {
    Route::get('/see', [ReportController::class, 'index']);
       Route::put('/status/{id}', [ReportController::class, 'updatestatus']);
+ 
 
+});
 
+Route::prefix('exports/pdf')->group(function () {
+
+  Route::get('/financial',
+        [AdminReportController::class, 'financialPdf']);
+
+    Route::get('/users',
+        [AdminReportController::class, 'usersPdf']);
+
+    Route::get('/requests',
+        [AdminReportController::class, 'requestsPdf']);
+
+    Route::get('/withdrawals',
+        [AdminReportController::class, 'withdrawalsPdf']);
+
+    Route::get('/audit',
+        [AdminReportController::class, 'auditPdf']);
+
+    Route::get('/tickets',
+        [AdminReportController::class, 'ticketsPdf']);
+
+    Route::get('/analytics',
+        [AdminReportController::class, 'analyticsPdf']);
 });
 Route::prefix('bans')->group(function () {
    Route::post('/{id}', [BanController::class, 'ban']);
@@ -240,7 +271,19 @@ Route::prefix('bans')->group(function () {
 Route::get('banned-users', [BanController::class, 'bannedUsers']);
 
 });
+ Route::get(
+            '/statistics/dashboard',
+            [AdminStatisticsController::class, 'dashboard']
+        );
+Route::get(
+            '/backups',
+            [AdminBackupController::class, 'index']
+        );
 
+        Route::get(
+            '/backups/download/{file}',
+            [AdminBackupController::class, 'download']
+        );
         });
     });
 
@@ -268,4 +311,5 @@ Route::prefix('cashier')
     });
 
 Broadcast::routes(['prefix'=>'v1','middleware'=>['auth:user_api', 'check.ban']]);
+
 
