@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Enums\NotificationType;
 use App\Models\ServiceCategory;
 use App\Models\ServiceRequest;
 use App\Repositories\CategoryRepository;
@@ -59,7 +60,7 @@ $images = request()->file('answers');
 
     $uploadedImages = [];
 
-    // إذا صورة واحدة
+    
     if (!is_array($questionImages)) {
         $questionImages = [$questionImages];
     }
@@ -81,14 +82,40 @@ $images = request()->file('answers');
         }
     }
 }
-Cache::forget("available_requests");
 
-        return $this->requestRepo->create([
+
+        $serviceRequest = $this->requestRepo->create([
             'user_id' => $user->id,
             'category_id' => $category->id,
             'answers' => $answers,
             'status' => 'pending'
         ]);
+  // في createRequest بعد الحفظ
+$category->load('providers'); // ضمان تحميل المزودين
+
+foreach ($category->providers as $provider) {
+    // مسح كاش الصفحة الأولى على الأقل
+    Cache::forget("provider:{$provider->id}:available_requests:page_1");
+}
+
+dispatch(function () use ($category, $serviceRequest, $user) {
+    foreach ($category->providers as $provider) {
+        if ($provider->id !== $user->id) {
+            NotificationService::send(
+                $provider,
+                "طلب خدمة جديد",
+                "تمت إضافة طلب جديد في قسم {$category->name}",
+                NotificationType::NEW_SERVICE_REQUEST,
+                [
+                    'service_request_id' => $serviceRequest->id,
+                    'category_id'        => $category->id,
+                ]
+            );
+        }
+    }
+});
+        
+return $serviceRequest;
     }
 
     private function validateAnswerType($question, $answer)
@@ -130,10 +157,35 @@ Cache::forget("available_requests");
         return response()->json('select cat first');
     }
 
-    $key = "provider:{$provider->id}:available_requests:v1";
+   
 
-    return Cache::remember($key, 300, function () use ($provider) {
+  $page = request()->get('page', 1);
+$key = "provider:{$provider->id}:available_requests:page_{$page}";
+
+return Cache::remember($key, 300, function () use ($provider) {
     return $this->requestRepo->getRequestsForProvider($provider);
 });
+
+}
+public function acceptedRequests($user)
+{
+    if ($user->role === 'provider') {
+
+        return $this->requestRepo
+            ->acceptedForProvider($user);
+    }
+
+    return $this->requestRepo
+        ->acceptedForUser($user);
+}
+public function rejected($user)
+{
+   
+
+        return $this->requestRepo
+            ->rejected($user);
+    
+
+    
 }
 }

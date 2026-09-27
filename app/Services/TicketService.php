@@ -7,6 +7,7 @@ use App\Models\TicketMessage;
 use App\Models\TicketAttachment;
 use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -43,7 +44,7 @@ class TicketService
             'priority' => $data['priority'],
         ]);
 
-        // Invalidate related caches (important)
+        
         Cache::forget($this->ticketsFilterKey([]));
 
         if (!empty($data['attachments'])) {
@@ -95,7 +96,7 @@ class TicketService
 
         DB::commit();
 
-        // Invalidate cache properly
+       
         Cache::forget($this->ticketMessagesKey($ticketId));
 
         return $message->load('attachments', 'sender');
@@ -191,5 +192,11 @@ class TicketService
                     ->paginate(20);
             }
         );
+    }
+    public function getall(){
+
+    $userId= Auth::user()->id;
+    
+ return  Ticket::where('user_id',$userId)->paginate(10);
     }
 }

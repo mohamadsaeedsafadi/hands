@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Repositories\QuestionRepository;
+use Dompdf\Image\Cache;
 
 class AdminQuestionService
 {
@@ -25,11 +26,14 @@ class AdminQuestionService
 
     public function update($id, $data)
     {
+        
         return $this->repo->update($id, $data);
+
     }
 
     public function delete($id)
     {
+        
         return $this->repo->delete($id);
     }
 }

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Services\NotificationService;
 use App\Enums\NotificationType;
+use App\Models\ServiceRequest;
+
 class ServiceOfferService
 {
     protected $offerRepo;
@@ -33,13 +35,35 @@ if ($exists) {
     throw new Exception('لقد قمت بإرسال عرض مسبقاً لهذا الطلب.');
 }
 $this->clearOfferCache($provider->id);
-        return $this->repo->create([
+        $offer = $this->repo->create([
             'service_request_id' => $data['service_request_id'],
             'provider_id' => $provider->id,
             'min_price' => $data['min_price'],
             'max_price' => $data['max_price'],
             'message' => $data['message'] ?? null
         ]);
+        $serviceRequest = ServiceRequest::with('user', 'category')->find($data['service_request_id']);
+
+    if ($serviceRequest && $serviceRequest->user) {
+        $client = $serviceRequest->user;
+        $categoryName = $serviceRequest->category->name ?? 'الخدمة';
+
+        NotificationService::send(
+            $client,
+            "عرض جديد على طلبك",
+            "قام مقدم الخدمة {$provider->name} بتقديم عرض جديد على طلبك لـ ({$categoryName}).",
+            NotificationType::NEW_OFFER_RECEIVED,
+            [
+                'service_request_id' => $serviceRequest->id,
+                'offer_id'           => $offer->id,
+                'provider_id'        => $provider->id,
+                'min_price'          => $data['min_price'],
+                'max_price'          => $data['max_price'],
+            ]
+        );
+    }
+
+    return $offer;
     }
    
   public function assignCategories($provider, array $categoryIds)
@@ -250,11 +274,9 @@ NotificationService::send(
 public function myoffer($request)
 {
     $userId = Auth::user()->id;
-    $page = $request->get('page', 1);
-
-    return Cache::remember("offers.my.$userId.page.$page", 60, function () use ($request, $userId) {
+    
         return $this->repo->getUserOffers($userId, $request->all());
-    });
+
 }
 public function nearbyOffers($user, $filters)
 {
@@ -293,6 +315,7 @@ public function recommendProviders($user, $categoryId)
         );
     });
 }
+
 private function clearOfferCache($userId)
 {
     Cache::forget("offers.my.$userId");

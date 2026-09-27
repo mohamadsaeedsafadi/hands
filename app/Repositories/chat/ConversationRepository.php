@@ -20,8 +20,9 @@ class ConversationRepository
         return Conversation::findOrFail($id);
     }
      public function getUserConversations($userId)
-    {
-        return Conversation::with([
+{
+    
+    $conversations = Conversation::with([
         'user',
         'provider',
         'messages' => function ($q) {
@@ -34,5 +35,22 @@ class ConversationRepository
     })
     ->latest()
     ->paginate(10);
-    }
+
+    $serviceRequestIds = $conversations->pluck('service_request_id')->filter()->unique();
+
+    $serviceRequests = \App\Models\ServiceRequest::with('category')
+        ->whereIn('id', $serviceRequestIds)
+        ->get()
+        ->keyBy('id');
+
+    $conversations->through(function ($conversation) use ($serviceRequests) {
+        $serviceRequest = $serviceRequests->get($conversation->service_request_id);
+
+        $conversation->service_name = $serviceRequest?->category?->name ?? null;
+
+        return $conversation;
+    });
+
+    return $conversations;
+}
 }

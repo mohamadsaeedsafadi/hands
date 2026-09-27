@@ -2,6 +2,7 @@
 namespace App\Repositories;
 
 use App\Models\Profile;
+use App\Models\User;
 
 class ProfileRepository
 {
@@ -15,6 +16,6 @@ class ProfileRepository
 
     public function getByUserId($userId)
     {
-        return Profile::where('user_id', $userId)->first();
+        return [Profile::where('user_id', $userId)->first(),User::where('id',$userId)->get(['provider_verified_at','rating_avg'])];
     }
 }

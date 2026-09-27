@@ -1,39 +1,75 @@
 <?php
+
 namespace App\Services;
 
-use App\Http\Responses\ApiResponse;
+use App\Models\ServiceQuestion;
 use App\Repositories\CategoryRepository;
 use App\Repositories\QuestionRepository;
 use Illuminate\Support\Facades\Cache;
-use function PHPUnit\Framework\isNull;
 
 class QuestionService
 {
     protected $questionRepo;
-    protected $rebo;
-    public function __construct(QuestionRepository $questionRepo , CategoryRepository $rebo)
-    {
+    protected $categoryRepo;
+
+    public function __construct(
+        QuestionRepository $questionRepo,
+        CategoryRepository $categoryRepo
+    ) {
         $this->questionRepo = $questionRepo;
-        $this->rebo=$rebo;
+        $this->categoryRepo = $categoryRepo;
     }
 
-    public function createQuestion(array $data)
+    public function create(array $data)
     {
         $question = $this->questionRepo->create($data);
 
-    Cache::forget("category.{$data['category_id']}.questions");
+        Cache::forget("category.{$data['category_id']}.questions");
 
-    return $question;
+        return $question;
     }
+
     public function getCategoryQuestions($categoryId)
-{
-    
-    $check= $this->rebo->getMainCategoriesbyid($categoryId);
-    if($check == $categoryId){
-          throw new \Exception("Category must be a subcategory");
+    {
+        $check = $this->categoryRepo->getMainCategoriesbyid($categoryId);
+
+       
+        if ($check) {
+            throw new \Exception("Category must be a subcategory");
+        }
+
+         
+            return $this->categoryRepo->findWithQuestions($categoryId);
+            
     }
-     return Cache::remember("category.$categoryId.questions", 3600, function () use ($categoryId) {
-        return $this->rebo->findWithQuestions($categoryId);
-    });
+
+    public function getAll()
+    {
+        return $this->questionRepo->all();
+    }
+
+    public function update($id, array $data)
+    {
+        Cache::forget("category.{$data['category_id']}.questions");
+
+        return $this->questionRepo->update($id, $data);
+    }
+
+    public function delete($id)
+{
+    $question = $this->questionRepo->find($id);
+
+    if (!$question) {
+        throw new \Exception("Question not found");
+    }
+$cat= ServiceQuestion::where('id',$id)->value('category_id');
+    $cacheKey = "category.{$cat}.questions";
+
+    Cache::forget($cacheKey);
+
+    $deleted = $this->questionRepo->delete($id);
+
+
+    return $deleted;
 }
 }

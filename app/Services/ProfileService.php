@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repositories\ProfileRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class ProfileService
@@ -21,9 +23,11 @@ class ProfileService
 
     public function getProfile($userId)
     {
-        return Cache::remember($this->cacheKey($userId), 3600, function () use ($userId) {
+          $x= Auth::user()->id;
+        $name= User::where('id',$x)->get('name');
+        return [Cache::remember($this->cacheKey($userId), 3600, function () use ($userId) {
             return $this->repo->getByUserId($userId);
-        });
+        }),'name',$name];
     }
 
     public function updateProfile($user, $data)
@@ -35,7 +39,8 @@ class ProfileService
         $profile = $this->repo->updateOrCreate($user->id, $data);
 
         Cache::forget($this->cacheKey($user->id));
-
-        return $profile;
+        $x= Auth::user()->id;
+        $name= User::where('id',$x)->get('name');
+        return [$profile,'name:',$name];
     }
 }

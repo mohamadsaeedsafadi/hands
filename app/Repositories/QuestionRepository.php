@@ -26,4 +26,8 @@ class QuestionRepository
     {
         return ServiceQuestion::destroy($id);
     }
+    public function find($id){
+    return ServiceQuestion::find($id);
+        
+    }
 }

@@ -2,6 +2,7 @@
 namespace App\Repositories;
 
 use App\Models\ServiceOffer;
+use App\Models\ServiceRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -132,8 +133,8 @@ $offer->eta_minutes = isset($item->eta_minutes)
 
         return $offer;
     })->filter()->values();
-
-    return $final ;
+$results->setCollection($final);
+    return $results ;
 }
     public function create($data)
     {   
@@ -247,4 +248,5 @@ public function smartProviders($lat, $lng, $categoryId)
         ->limit(10)
         ->paginate(10);
 }
+
 }
